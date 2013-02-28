@@ -9,55 +9,88 @@ public class Client {
 	
 	static void writeCardsToDB(Connection conn)
 	{
-	int numberOfCards = 100000; // 10 Mio dauert ca.
-	long cardnumber_start = 1111222233330000L;
-	long cardnumber = cardnumber_start;
-	int[] daily = {100, 200, 500, 1000, 2000, 5000, 10000, 20000, 100000, 1000000};
-	int[] monthly = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 1000000, 10000000};
-	int number_rnd10 = 0;
-	int number_rndfn = 0;
-	int number_rndln = 0;
-	List<String> firstn = readNamesFromFile("baby-names.csv");
-	List<String> lastn = readNamesFromFile("surnames.csv");
+		int numberOfCards = 1000; // 100000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		long cardnumber_start = 1111222233330000L;
+		long cardnumber = cardnumber_start;
+		int[] daily = {100, 200, 500, 1000, 2000, 5000, 10000, 20000, 100000, 1000000};
+		int[] monthly = {1000, 2000, 5000, 10000, 20000, 50000, 100000, 200000, 1000000, 10000000};
+		int number_rnd10 = 0;
+		int number_rndfn = 0;
+		int number_rndln = 0;
+		List<String> firstn = readNamesFromFile("baby-names.csv");
+		List<String> lastn = readNamesFromFile("surnames.csv");
+		
+		for (int i = 0; i < numberOfCards; i++){
+			if ( i % 100 == 0 ) {
+				System.out.println("Number of Cards: \t" + i);
+			}
+			number_rnd10 = (int) (Math.random()*10);  //random number from 0 till 9
+			number_rndfn = (int) (Math.random()*firstn.size());  //random number for namearray
+			number_rndln = (int) (Math.random()*lastn.size());   //random number for namearray
+			
+			try {
+				Statement stmt = conn.createStatement();
+				stmt.execute("SELECT insert_card(CAST ("+
+				 cardnumber++ +" AS bigint), CAST ("+
+				 daily[number_rnd10] +" AS numeric), CAST ( "+
+				  monthly[number_rnd10] +" AS numeric), "+ true +
+				  ", CAST("+ 5 +" AS SMALLINT), CAST( '"
+				  +firstn.get(number_rndfn)+
+				 " "+ lastn.get(number_rndln) + "' AS text));");
+			
+			} catch (SQLException e) {
+				System.out.println("Error while executing Stored Procedure insert_card");
+				e.printStackTrace();
+				return;
+			}
+		}		
+	}
 	
-	for (int i = 0; i < numberOfCards; i++){
-		if ( i % 100 == 0 ) {
-			System.out.println("Number of Cards: \t" + i);
-		}
-		number_rnd10 = (int) (Math.random()*10);  //random number from 0 till 9
-		number_rndfn = (int) (Math.random()*firstn.size());  //random number for namearray
-		number_rndln = (int) (Math.random()*lastn.size());   //random number for namearray
+		static void writeCountriesToDB(Connection conn)
+	{
+		//Load Countries from file
+		String zeile = "";
+		String[] parts = new String[4];
 		
 		try {
-		
+			FileReader fr = new FileReader("country_names_and_code_elements_txt.txt");
+			BufferedReader br = new BufferedReader(fr);
+			
 			Statement stmt = conn.createStatement();
-			stmt.execute("SELECT insert_card(CAST ("+ cardnumber++ +" AS bigint), CAST ("+
-			 daily[number_rnd10] +" AS numeric), CAST ( "+ monthly[number_rnd10] +
-			 " AS numeric), "+ true +", CAST("+ 5 +" AS SMALLINT), CAST( '"+firstn.get(number_rndfn)+
-			 " "+ lastn.get(number_rndln) + "' AS text));");
+			while( (zeile = br.readLine()) != null )
+			{
+				parts = zeile.split(";");
+				//TODO
+				//myApp.callProcedure("Insert_country", parts[1],parts[0],"");
+				//myApp.callProcedure("Insert_country_specific", parts[1], parts[2],parts[3]);
+				
+				stmt.execute("SELECT insert_country(CAST ('"+
+				parts[1] +"' AS text), CAST ('"+
+				parts[0] +"' AS text), CAST(' ' AS text));");
+				
+			}
+		br.close();
+		fr.close();
 		
+		} catch (IOException e) {
+			System.out.println("Dateilesefehler");
+			e.printStackTrace();
+			return;
 		} catch (SQLException e) {
- 
-			System.out.println("Error while executing Stored Procedure insert_card");
+			System.out.println("Error while executing Stored Procedure insert_country or insert country specific");
 			e.printStackTrace();
 			return;
 		}
-		
-	}		
-	
-		
 	}
 	
 	static List<String> readNamesFromFile(String dateiname) 
 	{
 		List<String> names = new ArrayList<String>();
 		String zeile = "";
-		FileReader fr = null;
-		BufferedReader br = null;
 		
 		try {
-			fr = new FileReader(dateiname);
-			br = new BufferedReader(fr);
+			FileReader fr = new FileReader(dateiname);
+			BufferedReader br = new BufferedReader(fr);
 
 			while( (zeile = br.readLine()) != null )
 			{
@@ -117,10 +150,9 @@ public class Client {
 			System.out.println("Failed to make connection!");
 		}
 		
-		
 		writeCardsToDB(conn);
+		writeCountriesToDB(conn);
 
-		//TODO länder
 		System.out.printf("Datenbank vorbereitet \n\n");
 		
 	}

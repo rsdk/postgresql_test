@@ -33,7 +33,8 @@ CREATE TABLE country_specific (
 CREATE TABLE countries (
     country_code VARCHAR(2) NOT NULL UNIQUE,
     country_name VARCHAR(64) NOT NULL,
-    notes VARCHAR(200)
+    notes VARCHAR(200),
+    PRIMARY KEY (country_code)
 );
 CREATE INDEX country_specific_per_card_idx ON country_specific_per_card (card_num, country_code);
 CREATE INDEX transfer_idx ON transfer (card_num, country_code, transfer_time);

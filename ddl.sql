@@ -12,7 +12,7 @@ CREATE TABLE card (
     card_num BIGINT NOT NULL,
     daily_limit DECIMAL,
     monthly_limit DECIMAL,
-    blocked TINYINT,
+    blocked BOOLEAN,
     distance_per_hour_max SMALLINT,
     customer_name VARCHAR(64),
     PRIMARY KEY (card_num)
@@ -20,13 +20,13 @@ CREATE TABLE card (
 CREATE TABLE country_specific_per_card (
     card_num BIGINT NOT NULL,
     country_code VARCHAR(2) NOT NULL,
-    disallowed TINYINT,
+    disallowed BOOLEAN,
     daily_limit DECIMAL,
     PRIMARY KEY (card_num, country_code)
 );
 CREATE TABLE country_specific (
     country_code VARCHAR(2) NOT NULL,
-    disallowed TINYINT,
+    disallowed BOOLEAN,
     daily_limit DECIMAL,
     PRIMARY KEY (country_code)
 );

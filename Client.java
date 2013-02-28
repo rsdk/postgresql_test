@@ -55,6 +55,7 @@ public class Client {
 		try {
 			FileReader fr = new FileReader("country_names_and_code_elements_txt.txt");
 			BufferedReader br = new BufferedReader(fr);
+			Boolean ok;
 			
 			Statement stmt = conn.createStatement();
 			while( (zeile = br.readLine()) != null )
@@ -67,6 +68,12 @@ public class Client {
 				stmt.execute("SELECT insert_country(CAST ('"+
 				parts[1] +"' AS text), CAST ('"+
 				parts[0] +"' AS text), CAST(' ' AS text));");
+				
+				stmt.execute("SELECT insert_country_specific(CAST ('"+
+				parts[1] +"' AS text), CAST ("+
+				(ok = Integer.parseInt(parts[2]) == 1 ? true : false) +" AS BOOLEAN), CAST('"+
+				parts[3] +"' AS numeric));");
+				
 				
 			}
 		br.close();
@@ -150,7 +157,7 @@ public class Client {
 			System.out.println("Failed to make connection!");
 		}
 		
-		writeCardsToDB(conn);
+		//writeCardsToDB(conn);
 		writeCountriesToDB(conn);
 
 		System.out.printf("Datenbank vorbereitet \n\n");

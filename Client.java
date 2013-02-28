@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.io.*;
 import java.util.*;
+
  
 public class Client {
 	
@@ -119,22 +120,6 @@ public class Client {
  
 		System.out.println("-------- PostgreSQL "
 				+ "JDBC Connection Testing ------------");
- 
-		try {
- 
-			Class.forName("org.postgresql.Driver");
- 
-		} catch (ClassNotFoundException e) {
- 
-			System.out.println("Where is your PostgreSQL JDBC Driver? "
-					+ "Include in your library path!");
-			e.printStackTrace();
-			return;
- 
-		}
- 
-		System.out.println("PostgreSQL JDBC Driver Registered!");
- 
 		Connection conn = null;
  
 		try {
@@ -148,7 +133,6 @@ public class Client {
 			System.out.println("Connection Failed! Check output console");
 			e.printStackTrace();
 			return;
- 
 		}
  
 		if (conn != null) {
@@ -156,9 +140,20 @@ public class Client {
 		} else {
 			System.out.println("Failed to make connection!");
 		}
+
 		
-		//writeCardsToDB(conn);
+		long startTime = System.nanoTime();
+		writeCardsToDB(conn);
+		long endTime = System.nanoTime();
+		double duration = (endTime - startTime)/1000000000.0;
+		System.out.println("Karten hinzufügen hat: "+ duration+" Sekunden gedauert.");
+		
+		startTime = System.nanoTime();
 		writeCountriesToDB(conn);
+		endTime = System.nanoTime();
+		duration = (endTime - startTime)/1000000000.0;
+		System.out.println("Länder hinzufügen hat: "+ duration+" Sekunden gedauert.");
+		
 
 		System.out.printf("Datenbank vorbereitet \n\n");
 		

@@ -8,9 +8,9 @@ import java.util.*;
  
 public class Client {
 	
-	static void writeCardsToDB(Connection conn)
+	static void writeCardsToDB(Connection conn, int numberOfCards)
 	{
-		int numberOfCards = 1000; // 100000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		
 		long cardnumber_start = 1111222233330000L;
 		long cardnumber = cardnumber_start;
 		int[] daily = {100, 200, 500, 1000, 2000, 5000, 10000, 20000, 100000, 1000000};
@@ -136,17 +136,22 @@ public class Client {
 		}
  
 		if (conn != null) {
-			System.out.println("Hello World!");
+			System.out.println("Connection OK.");
 		} else {
 			System.out.println("Failed to make connection!");
 		}
 
 		
+		int numberOfCards = 1000; // 100000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		
 		long startTime = System.nanoTime();
-		writeCardsToDB(conn);
+		writeCardsToDB(conn, numberOfCards);
 		long endTime = System.nanoTime();
-		double duration = (endTime - startTime)/1000000000.0;
+		double duration = (endTime - startTime)/1000000000.0; //in Sekunden
 		System.out.println("Karten hinzufügen hat: "+ duration+" Sekunden gedauert.");
+		System.out.println("Das sind: "+ numberOfCards/duration +" Karten pro Sekunde.");
+
+		
 		
 		startTime = System.nanoTime();
 		writeCountriesToDB(conn);

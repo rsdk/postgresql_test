@@ -120,7 +120,7 @@ public class Client {
 	static void transfers(Connection conn, int numberOfTransactions) {
 			
 			
-		int numberOfCards = 1000000; // 10 Mio dauert ca. eine Stunde
+		int numberOfCards = 100000; // 10 Mio dauert ca. eine Stunde
 		long cardnumber_start = 1111222233330000L;
 		
 		long number_rndcard = 0;
@@ -184,7 +184,7 @@ public class Client {
 		}
 
 		int numberOfTransfers = 1000000;
-		int numberOfCards = 1000000; // 100.000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		int numberOfCards = 100000; // 100.000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
 		
 		long startTime = System.nanoTime();
 		writeCardsToDB(conn, numberOfCards);

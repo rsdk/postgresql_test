@@ -6,8 +6,8 @@ DECLARE
 	delta_lat decimal := 0;
 	delta_long decimal := 0;
 	distance decimal := 0;
-	delta_time interval;
-	
+	delta_time double precision;
+
 	--Kartendaten
 	v_blocked card.blocked%TYPE;
 	v_daily_limit card.daily_limit%TYPE;
@@ -43,13 +43,18 @@ BEGIN
 	SELECT sum(amount) INTO v_sum_daily FROM transfer WHERE card_num = $1 AND transfer_time > minusOneD;
 	SELECT sum(amount) INTO v_sum_monthly FROM transfer WHERE card_num = $1 AND transfer_time > minusOneM;
 
-	IF v_card.blocked = false THEN
+	--RAISE NOTICE 'minusOneDay: %', minusOneD;
+	RAISE NOTICE 'card num: %', $1;
+	RAISE NOTICE 'v_sum_daily: %', v_sum_daily;
+	IF v_blocked != true THEN
 	--Card is not blocked
-		IF $2 > v_sum_daily THEN
+		RAISE NOTICE 'not blocked';
+		IF ($2 < v_sum_daily) OR v_sum_daily is null THEN
+		RAISE NOTICE 'daily';
 		--daily amount is less than allowed
-			IF $2 > v_sum_monthly THEN
+			IF ($2 < v_sum_monthly) OR v_sum_monthly is null THEN
 			-- monthly amount is less than allowed
-				IF $2 > v_sum_country_daily THEN
+				IF ($2 < v_sum_country_daily) OR v_sum_country_daily is null THEN
 				-- country specific data and is not too high
 					-- distance check $3 lat; $4 long
 					IF v_latitude > 0 THEN
@@ -59,7 +64,8 @@ BEGIN
 						
 						delta_time = EXTRACT(EPOCH FROM age( current_t, v_transfer_time));
 						-- interval zu sekunden?
-						IF ( distance / (delta_time * 60 * 60) <= v_distance_per_hour_max ) THEN
+						RAISE NOTICE 'delta_time: %', delta_time;
+						IF ( (distance / (delta_time * 60 * 60)) <= v_distance_per_hour_max ) THEN
 							INSERT INTO transfer VALUES (current_t, $1, $2, $6, $3, $4, $5);
 						END IF;
 					ELSE

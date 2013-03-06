@@ -34,7 +34,7 @@ public class Client {
 				stmt.execute("SELECT insert_card(CAST ("+
 				 cardnumber++ +" AS bigint), CAST ("+
 				 daily[number_rnd10] +" AS numeric), CAST ( "+
-				  monthly[number_rnd10] +" AS numeric), "+ true +
+				  monthly[number_rnd10] +" AS numeric), "+ false +
 				  ", CAST("+ 5 +" AS SMALLINT), CAST( '"
 				  +firstn.get(number_rndfn)+
 				 " "+ lastn.get(number_rndln) + "' AS text));");
@@ -142,7 +142,7 @@ public class Client {
 		}
 
 		
-		int numberOfCards = 1000; // 100000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		int numberOfCards = 10000; // 100.000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
 		
 		long startTime = System.nanoTime();
 		writeCardsToDB(conn, numberOfCards);

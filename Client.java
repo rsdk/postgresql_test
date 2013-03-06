@@ -116,6 +116,48 @@ public class Client {
 		return names;
 	}
 	
+	
+	static void transfers(Connection conn, int numberOfTransactions) {
+			
+			
+		int numberOfCards = 1000000; // 10 Mio dauert ca. eine Stunde
+		long cardnumber_start = 1111222233330000L;
+		
+		long number_rndcard = 0;
+		long amount = 0;
+		String country_code = "DE";
+		double lat_neu = 48.4;
+		double long_neu = 13.9;
+		
+		long rnd_cardnumber = 0L;
+		
+		for (int k = 0; k < numberOfTransactions; k++) {
+			amount = (int) (Math.random()*10);
+			rnd_cardnumber = cardnumber_start+((int) (Math.random()*numberOfCards));
+			if ( k % 1000 == 0 ) {
+				System.out.println("Transfer-number: " + k);
+			}
+			String zweck = "TEST " + k;
+			
+			try {
+					Statement stmt = conn.createStatement();
+					stmt.execute("SELECT new_transfer(CAST ("+
+					 rnd_cardnumber +" AS bigint), CAST ("+
+					 amount +" AS numeric), CAST ( "+
+					  48.2 +" AS double precision), CAST ("+
+					  13.0 +" AS double precision), CAST("+ "'DE'" +" AS text), CAST( '"+
+					 zweck + "' AS text));");
+				
+				} catch (SQLException e) {
+					System.out.println("Error while executing Stored Procedure new_transfer");
+					e.printStackTrace();
+					return;
+				}	
+			}
+		
+		
+		}
+	
 	public static void main(String[] argv) {
  
 		System.out.println("-------- PostgreSQL "
@@ -141,8 +183,8 @@ public class Client {
 			System.out.println("Failed to make connection!");
 		}
 
-		
-		int numberOfCards = 10000; // 100.000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
+		int numberOfTransfers = 1000000;
+		int numberOfCards = 1000000; // 100.000 dauert ca. 15 min auf hdd und 1min 30sek auf ssd
 		
 		long startTime = System.nanoTime();
 		writeCardsToDB(conn, numberOfCards);
@@ -152,7 +194,6 @@ public class Client {
 		System.out.println("Das sind: "+ numberOfCards/duration +" Karten pro Sekunde.");
 
 		
-		
 		startTime = System.nanoTime();
 		writeCountriesToDB(conn);
 		endTime = System.nanoTime();
@@ -160,6 +201,13 @@ public class Client {
 		System.out.println("Länder hinzufügen hat: "+ duration+" Sekunden gedauert.");
 		
 
+		startTime = System.nanoTime();
+		transfers(conn, numberOfTransfers);
+		endTime = System.nanoTime();
+		duration = (endTime - startTime)/1000000000.0;
+		System.out.println("Transfers haben "+ duration+" Sekunden gedauert.");
+		System.out.println("Das sind: "+ numberOfTransfers/duration +" Transfers pro Sekunde.");
+		
 		System.out.printf("Datenbank vorbereitet \n\n");
 		
 	}
